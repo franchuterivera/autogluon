@@ -602,6 +602,7 @@ class AbstractTrainer:
                     # TODO: Do the below more elegantly, ideally as a parameter to the trainer train function to disable recording scores/pred time.
                     for model_weighted_ensemble in models_trained:
                         model_loaded = self.load_model(model_weighted_ensemble)
+                        model_loaded.train_score = None
                         model_loaded.val_score = None
                         model_loaded.predict_time = None
                         self.set_model_attribute(model=model_weighted_ensemble, attribute='val_score', val=None)
@@ -1437,6 +1438,7 @@ class AbstractTrainer:
     def leaderboard(self, extra_info=False):
         model_names = self.get_model_names_all()
         score_val = []
+        score_train = []
         fit_time_marginal = []
         pred_time_val_marginal = []
         stack_level = []
@@ -1445,10 +1447,12 @@ class AbstractTrainer:
         can_infer = []
         fit_order = list(range(1,len(model_names)+1))
         score_val_dict = self.get_models_attribute_dict('val_score')
+        score_train_dict = self.get_models_attribute_dict('train_score')
         fit_time_marginal_dict = self.get_models_attribute_dict('fit_time')
         predict_time_marginal_dict = self.get_models_attribute_dict('predict_time')
         for model_name in model_names:
             score_val.append(score_val_dict[model_name])
+            score_train.append(score_train_dict[model_name])
             fit_time_marginal.append(fit_time_marginal_dict[model_name])
             fit_time.append(self.get_model_attribute_full(model=model_name, attribute='fit_time'))
             pred_time_val_marginal.append(predict_time_marginal_dict[model_name])
@@ -1508,6 +1512,7 @@ class AbstractTrainer:
         df = pd.DataFrame(data={
             'model': model_names,
             'score_val': score_val,
+            'score_train': score_train,
             'pred_time_val': pred_time_val,
             'fit_time': fit_time,
             'pred_time_val_marginal': pred_time_val_marginal,
@@ -1523,6 +1528,7 @@ class AbstractTrainer:
         explicit_order = [
             'model',
             'score_val',
+            'score_train',
             'pred_time_val',
             'fit_time',
             'pred_time_val_marginal',

@@ -341,6 +341,7 @@ class TabularPredictor(BasePredictor):
         results = {
             'model_types': model_typenames,  # dict with key = model-name, value = type of model (class-name)
             'model_performance': self._trainer.get_models_attribute_dict('val_score'),  # dict with key = model-name, value = validation performance
+            'model_train_performance': self._trainer.get_models_attribute_dict('train_score'),  # dict with key = model-name, value = validation performance
             'model_best': self._trainer.model_best,  # the name of the best model (on validation data)
             'model_paths': self._trainer.get_models_attribute_dict('path'),  # dict with key = model-name, value = path to model file
             'model_fit_times': self._trainer.get_models_attribute_dict('fit_time'),

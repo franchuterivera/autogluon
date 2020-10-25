@@ -88,6 +88,7 @@ class AbstractModel:
 
         self.fit_time = None  # Time taken to fit in seconds (Training data)
         self.predict_time = None  # Time taken to predict in seconds (Validation data)
+        self.train_score = None  # Score with eval_metric (Train data)
         self.val_score = None  # Score with eval_metric (Validation data)
 
         self.params = {}
@@ -235,6 +236,7 @@ class AbstractModel:
         else:
             logger.warning(f'\tWarning: Model has no time left to train, skipping model... (Time Left = {round(kwargs["time_limit"], 1)}s)')
             raise TimeLimitExceeded
+        self.train_score = self.score(kwargs['X_train'], kwargs['y_train'])
 
     def _fit(self, X_train, y_train, **kwargs):
         # kwargs may contain: num_cpus, num_gpus
@@ -599,6 +601,7 @@ class AbstractModel:
         self.fit_time = None
         self.predict_time = None
         self.val_score = None
+        self.train_score = None
         self.params_trained = dict()
 
     # TODO: Experimental, currently unused
@@ -648,6 +651,7 @@ class AbstractModel:
             fit_time=self.fit_time,
             predict_time=self.predict_time,
             val_score=self.val_score,
+            train_score=self.train_score,
             hyperparameters=self.params,
             hyperparameters_fit=self.params_trained,  # TODO: Explain in docs that this is for hyperparameters that differ in final model from original hyperparameters, such as epochs (from early stopping)
             hyperparameters_nondefault=self.nondefault_params,
