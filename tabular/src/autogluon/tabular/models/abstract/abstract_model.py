@@ -236,7 +236,8 @@ class AbstractModel:
         else:
             logger.warning(f'\tWarning: Model has no time left to train, skipping model... (Time Left = {round(kwargs["time_limit"], 1)}s)')
             raise TimeLimitExceeded
-        self.train_score = self.score(kwargs['X_train'], kwargs['y_train'])
+        if 'X_train' in kwargs:
+            self.train_score = self.score(kwargs['X_train'], kwargs['y_train'])
 
     def _fit(self, X_train, y_train, **kwargs):
         # kwargs may contain: num_cpus, num_gpus
