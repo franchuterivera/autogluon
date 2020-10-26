@@ -1452,7 +1452,11 @@ class AbstractTrainer:
         predict_time_marginal_dict = self.get_models_attribute_dict('predict_time')
         for model_name in model_names:
             score_val.append(score_val_dict[model_name])
-            score_train.append(score_train_dict[model_name])
+            if model_name in score_train_dict:
+                score_train.append(score_train_dict[model_name])
+            else:
+                score_train.append(0)
+
             fit_time_marginal.append(fit_time_marginal_dict[model_name])
             fit_time.append(self.get_model_attribute_full(model=model_name, attribute='fit_time'))
             pred_time_val_marginal.append(predict_time_marginal_dict[model_name])
