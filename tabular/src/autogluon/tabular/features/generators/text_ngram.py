@@ -1,3 +1,4 @@
+import os
 import copy
 import logging
 import traceback
@@ -188,7 +189,7 @@ class TextNgramFeatureGenerator(AbstractFeatureGenerator):
     def _adjust_vectorizer_memory_usage(self, transform_matrix, text_data, vectorizer_fit, downsample_ratio: int = None):
         # This assumes that the ngrams eventually turn into int32/float32 downstream
         predicted_ngrams_memory_usage_bytes = len(text_data) * 4 * (transform_matrix.shape[1] + 1) + 80
-        mem_avail = psutil.virtual_memory().available
+        mem_avail = os.environ.get('VIRTUAL_MEMORY_AVAILABLE', psutil.virtual_memory().available)
         mem_rss = psutil.Process().memory_info().rss
         predicted_rss = mem_rss + predicted_ngrams_memory_usage_bytes
         predicted_percentage = predicted_rss / mem_avail

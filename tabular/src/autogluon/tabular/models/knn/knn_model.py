@@ -1,3 +1,4 @@
+import os
 import logging
 import time
 
@@ -64,7 +65,7 @@ class KNNModel(AbstractModel):
         model_size_bytes = 4 * X_train.shape[0] * X_train.shape[1]  # Assuming float32 types
         expected_final_model_size_bytes = model_size_bytes * 3.6  # Roughly what can be expected of the final KNN model in memory size
         if expected_final_model_size_bytes > 10000000:  # Only worth checking if expected model size is >10MB
-            available_mem = psutil.virtual_memory().available
+            available_mem = os.environ.get('VIRTUAL_MEMORY_AVAILABLE', psutil.virtual_memory().available)
             model_memory_ratio = expected_final_model_size_bytes / available_mem
             if model_memory_ratio > (0.15 * max_memory_usage_ratio):
                 logger.warning(f'\tWarning: Model is expected to require {round(model_memory_ratio * 100, 2)}% of available memory...')

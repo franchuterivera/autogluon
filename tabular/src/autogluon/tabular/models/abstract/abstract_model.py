@@ -422,7 +422,7 @@ class AbstractModel:
         compute_count_max = 200
 
         X_size_bytes = sys.getsizeof(pickle.dumps(X, protocol=4))
-        available_mem = psutil.virtual_memory().available
+        available_mem = os.environ.get('VIRTUAL_MEMORY_AVAILABLE', psutil.virtual_memory().available)
         X_memory_ratio = X_size_bytes / available_mem
 
         compute_count_safe = math.floor(X_memory_ratio_max / X_memory_ratio)
