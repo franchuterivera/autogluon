@@ -80,7 +80,8 @@ def early_stop_custom(stopping_rounds, start_time=None, time_limit=None, maximiz
         bst = env.model
 
         state['init_mem_rss'] = mem_status.memory_info().rss
-        available = psutil.virtual_memory().available
+        #available = psutil.virtual_memory().available
+        available = os.environ.get('VIRTUAL_MEMORY_AVAILABLE', psutil.virtual_memory().available)
 
         if not env.evaluation_result_list:
             raise ValueError('For early stopping you need at least one set in evals.')
@@ -134,7 +135,7 @@ def early_stop_custom(stopping_rounds, start_time=None, time_limit=None, maximiz
         best_score = state['best_score']
         best_iteration = state['best_iteration']
         maximize_score = state['maximize_score']
-        
+
         if (maximize_score and score > best_score) or \
                 (not maximize_score and score < best_score):
             msg = '[%d]\t%s' % (
@@ -156,7 +157,8 @@ def early_stop_custom(stopping_rounds, start_time=None, time_limit=None, maximiz
             raise EarlyStopException(best_iteration)
 
         if env.iteration % 10 == 0:
-            available = psutil.virtual_memory().available
+            #available = psutil.virtual_memory().available
+            available = os.environ.get('VIRTUAL_MEMORY_AVAILABLE', psutil.virtual_memory().available)
             cur_rss = mem_status.memory_info().rss
             if cur_rss < state['init_mem_rss']:
                 state['init_mem_rss'] = cur_rss
@@ -174,13 +176,13 @@ def early_stop_custom(stopping_rounds, start_time=None, time_limit=None, maximiz
                 logger.warning(f'Available Memory: {available_mb} MB')
                 logger.warning(f'Estimated XGB model size: {estimated_model_size_mb} MB')
                 early_stop = True
-            
+
             if early_stop:
                 if verbose and env.rank == 0:
                     logger.warning(f'Warning: Early stopped GBM model prior to optimal result to avoid OOM error. Please increase available memory to avoid subpar model quality.\n')
                     logger.warning(f'Early stopping. best iteration is: [{best_iteration}]\t{best_score}')
                 raise EarlyStopException(best_iteration)
-        
+
         if time_limit:
             time_elapsed = time.time() - start_time
             time_left = time_limit - time_elapsed

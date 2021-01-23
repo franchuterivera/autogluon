@@ -140,7 +140,9 @@ def early_stopping_custom(stopping_rounds, first_metric_only=False, metrics_to_u
                         break
 
         init_mem_rss.append(mem_status.memory_info().rss)
-        init_mem_avail.append(psutil.virtual_memory().available)
+        available_mem = os.environ.get('VIRTUAL_MEMORY_AVAILABLE', psutil.virtual_memory().available)
+        #init_mem_avail.append(psutil.virtual_memory().available)
+        init_mem_avail.append(available_mem)
 
     def _callback(env):
         try_import_lightgbm()
@@ -213,7 +215,8 @@ def early_stopping_custom(stopping_rounds, first_metric_only=False, metrics_to_u
         # TODO: Add toggle parameter to early_stopping to disable this
         # TODO: Identify optimal threshold values for early_stopping based on lack of memory
         if env.iteration % 10 == 0:
-            available = psutil.virtual_memory().available
+            #available = psutil.virtual_memory().available
+            available = os.environ.get('VIRTUAL_MEMORY_AVAILABLE', psutil.virtual_memory().available)
             cur_rss = mem_status.memory_info().rss
 
             if cur_rss < init_mem_rss[0]:

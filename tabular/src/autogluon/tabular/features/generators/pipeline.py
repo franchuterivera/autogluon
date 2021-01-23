@@ -82,7 +82,8 @@ class PipelineFeatureGenerator(BulkFeatureGenerator):
         X_len = len(X)
         self.pre_memory_usage = get_approximate_df_mem_usage(X, sample_ratio=0.2).sum()
         self.pre_memory_usage_per_row = self.pre_memory_usage / X_len
-        available_mem = psutil.virtual_memory().available
+        #available_mem = psutil.virtual_memory().available
+        available_mem = os.environ.get('VIRTUAL_MEMORY_AVAILABLE', psutil.virtual_memory().available)
         pre_memory_usage_percent = self.pre_memory_usage / (available_mem + self.pre_memory_usage)
         self._log(20, f'\tAvailable Memory:                    {(round((self.pre_memory_usage + available_mem) / 1e6, 2))} MB')
         self._log(20, f'\tTrain Data (Original)  Memory Usage: {round(self.pre_memory_usage / 1e6, 2)} MB ({round(pre_memory_usage_percent * 100, 1)}% of available memory)')
@@ -94,7 +95,8 @@ class PipelineFeatureGenerator(BulkFeatureGenerator):
         self.post_memory_usage = get_approximate_df_mem_usage(X, sample_ratio=0.2).sum()
         self.post_memory_usage_per_row = self.post_memory_usage / X_len
 
-        available_mem = psutil.virtual_memory().available
+        #available_mem = psutil.virtual_memory().available
+        available_mem = os.environ.get('VIRTUAL_MEMORY_AVAILABLE', psutil.virtual_memory().available)
         post_memory_usage_percent = self.post_memory_usage / (available_mem + self.post_memory_usage + self.pre_memory_usage)
         self._log(20, f'\tTrain Data (Processed) Memory Usage: {round(self.post_memory_usage / 1e6, 2)} MB ({round(post_memory_usage_percent * 100, 1)}% of available memory)')
         if post_memory_usage_percent > 0.15:

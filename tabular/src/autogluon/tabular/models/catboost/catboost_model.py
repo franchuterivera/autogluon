@@ -89,7 +89,8 @@ class CatBoostModel(AbstractModel):
         max_memory_usage_ratio = self.params_aux['max_memory_usage_ratio']
         approx_mem_size_req = num_rows_train * num_cols_train * num_classes / 2  # TODO: Extremely crude approximation, can be vastly improved
         if approx_mem_size_req > 1e9:  # > 1 GB
-            available_mem = psutil.virtual_memory().available
+            #available_mem = psutil.virtual_memory().available
+            available_mem = os.environ.get('VIRTUAL_MEMORY_AVAILABLE', psutil.virtual_memory().available)
             ratio = approx_mem_size_req / available_mem
             if ratio > (1 * max_memory_usage_ratio):
                 logger.warning('\tWarning: Not enough memory to safely train CatBoost model, roughly requires: %s GB, but only %s GB is available...' % (round(approx_mem_size_req / 1e9, 3), round(available_mem / 1e9, 3)))
@@ -217,7 +218,8 @@ class CatBoostModel(AbstractModel):
             params_final = params.copy()
 
             # TODO: This only handles memory with time_limit specified, but not with time_limit=None, handle when time_limit=None
-            available_mem = psutil.virtual_memory().available
+            #available_mem = psutil.virtual_memory().available
+            available_mem = os.environ.get('VIRTUAL_MEMORY_AVAILABLE', psutil.virtual_memory().available)
             if self.problem_type == SOFTCLASS:  # TODO: remove this once catboost-dev is no longer necessary and SOFTCLASS objectives can be pickled.
                 model_size_bytes = 1  # skip memory check
             else:

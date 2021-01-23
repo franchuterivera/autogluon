@@ -402,7 +402,8 @@ def _get_safe_fi_batch_count(X, num_features, X_transformed=None, max_memory_rat
     X_size_bytes = sys.getsizeof(pickle.dumps(X, protocol=4))
     if X_transformed is not None:
         X_size_bytes += sys.getsizeof(pickle.dumps(X_transformed, protocol=4))
-    available_mem = psutil.virtual_memory().available
+    #available_mem = psutil.virtual_memory().available
+    available_mem = os.environ.get('VIRTUAL_MEMORY_AVAILABLE', psutil.virtual_memory().available)
     X_memory_ratio = X_size_bytes / available_mem
 
     feature_batch_count_safe = math.floor(max_memory_ratio / X_memory_ratio)
