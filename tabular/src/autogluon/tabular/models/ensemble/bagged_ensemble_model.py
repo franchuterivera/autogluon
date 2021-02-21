@@ -209,6 +209,7 @@ class BaggedEnsembleModel(AbstractModel):
                 fold_model.fit_time = time_train_end_fold - time_start_fold
                 fold_model.predict_time = time_predict_end_fold - time_train_end_fold
                 fold_model.val_score = fold_model.score_with_y_pred_proba(y=y_val_fold, y_pred_proba=pred_proba)
+                print(f"{time.ctime()} model={fold_model.name} fold={i} n_repeat_start={n_repeat_start} n_repeats={n_repeats} fold_start_n_repeat={fold_start_n_repeat} fold_end_n_repeat={fold_end_n_repeat} val_score={fold_model.val_score} for data={X_train_fold.shape}")
                 fold_model.reduce_memory_size(remove_fit=True, remove_info=False, requires_save=True)
                 if not self.params.get('save_bag_folds', True):
                     fold_model.model = None

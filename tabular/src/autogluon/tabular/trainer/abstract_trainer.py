@@ -245,6 +245,7 @@ class AbstractTrainer:
 
         model_names_fit = []
         for level in range(max(0, level_start), level_end + 1):
+            print(f"\n\nMAIN level={level}\n\n")
             core_kwargs_level = core_kwargs.copy()
             aux_kwargs_level = aux_kwargs.copy()
             if time_limit is not None:
@@ -265,6 +266,7 @@ class AbstractTrainer:
                 hyperparameter_tune_kwargs=hyperparameter_tune_kwargs, feature_prune=feature_prune,
                 core_kwargs=core_kwargs_level, aux_kwargs=aux_kwargs_level, name_suffix=name_suffix,
             )
+            print(f"stacked new level with base_model_names={base_model_names} aux_models={aux_models}")
             model_names_fit += base_model_names + aux_models
         self._time_limit = None
         self.save()
@@ -337,6 +339,7 @@ class AbstractTrainer:
             models = self.get_models(models, hyperparameter_tune_kwargs=kwargs.get('hyperparameter_tune_kwargs', None), level=level, name_suffix=name_suffix, ag_args=ag_args, ag_args_fit=ag_args_fit,
                                      hyperparameter_preprocess_func=self._process_hyperparameters, hyperparameter_preprocess_kwargs=hyperparameter_preprocess_kwargs)
         X_train_init = self.get_inputs_to_stacker(X, base_models=base_model_names, fit=True)
+        print(f"Training core with X_train_init={X_train_init} so going to call self._train_multi")
         if X_val is not None:
             X_val = self.get_inputs_to_stacker(X_val, base_models=base_model_names, fit=False)
         if X_unlabeled is not None:
@@ -1125,6 +1128,7 @@ class AbstractTrainer:
                 if time_limit is not None:
                     time_limit = time_limit - (time.time() - time_start)
 
+            print(f"calledn self._train_multi_fold with k_fold_start={k_fold_start} k_fold_end={k_fold} n_repeats={n_repeats}")
             models = self._train_multi_fold(models=models, hyperparameter_tune_kwargs=None, feature_prune=False, k_fold_start=k_fold_start, k_fold_end=k_fold, n_repeats=n_repeats, n_repeat_start=0, time_limit=time_limit, **fit_args)
 
         return models
@@ -1188,7 +1192,9 @@ class AbstractTrainer:
             n_repeats_initial = n_repeats
         else:
             n_repeats_initial = 1
+        print(f"Called _train_multi with k_fold={k_fold} n_repeats={n_repeats}")
         if n_repeat_start == 0:
+            print(f"in _train_multi n_repeat_start==0 so self._train_multi_initial")
             time_start = time.time()
             model_names_trained = self._train_multi_initial(X_train=X_train, y_train=y_train, models=models, k_fold=k_fold, n_repeats=n_repeats_initial, hyperparameter_tune_kwargs=hyperparameter_tune_kwargs, feature_prune=feature_prune,
                                                             time_limit=time_limit, **kwargs)
@@ -1452,6 +1458,7 @@ class AbstractTrainer:
             pred_time_val.append(self.get_model_attribute_full(model=model_name, attribute='predict_time'))
             stack_level.append(self.get_model_level(model_name))
             can_infer.append(self.model_graph.nodes[model_name]['can_infer'])
+            print(f"Leader board {model_name} score_val={score_val}")
 
         model_info_dict = defaultdict(list)
         if extra_info:
@@ -1514,6 +1521,7 @@ class AbstractTrainer:
             'fit_order': fit_order,
             **model_info_dict,
         })
+        print(f"leaderboard df={df}")
         df_sorted = df.sort_values(by=['score_val', 'pred_time_val', 'model'], ascending=[False, True, False]).reset_index(drop=True)
 
         df_columns_lst = df_sorted.columns.tolist()

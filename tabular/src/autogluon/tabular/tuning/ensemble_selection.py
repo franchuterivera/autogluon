@@ -130,6 +130,7 @@ class EnsembleSelection:
         self.indices_ = order
         self.trajectory_ = trajectory
         self.train_score_ = trajectory[-1]  # TODO: Select best iteration or select final iteration? Earlier iteration could have a better score!
+        print(f"Ensemble selection is running for {len(predictions)} with trajectory {self.trajectory_} indices={self.indices_}")
 
         if self.use_best:
             self.indices_ = order[:first_index_of_best+1]
