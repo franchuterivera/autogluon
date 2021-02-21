@@ -36,7 +36,7 @@ class GreedyWeightedEnsembleModel(AbstractModel):
             self.base_model_names = self._infer_base_model_names()
             self.features = self._set_stack_columns(base_model_names=self.base_model_names)
         X_train = self.preprocess(X_train)
-        print(f"Fitting ensemble seleciton with {X_train.shape}")
+        print(f"Fitting ensemble seleciton with {len(X_train)}")
 
         self.model = self.model_base(ensemble_size=self.params['ensemble_size'], problem_type=self.problem_type, metric=self.stopping_metric)
         self.model = self.model.fit(X_train, y_train, time_limit=time_limit)
