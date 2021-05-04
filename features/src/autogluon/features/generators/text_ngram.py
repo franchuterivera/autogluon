@@ -51,7 +51,7 @@ class TextNgramFeatureGenerator(AbstractFeatureGenerator):
         # TODO: Finetune this, or find a better way to ensure stability
         # TODO: adjust max_memory_ratio correspondingly if prefilter_tokens==True
         self.max_memory_ratio = max_memory_ratio  # Ratio of maximum memory the output ngram features are allowed to use in dense int32 form.
-        
+
         if vectorizer is None:
             self.vectorizer_default_raw = vectorizer_auto_ml_default()
         else:
@@ -61,14 +61,14 @@ class TextNgramFeatureGenerator(AbstractFeatureGenerator):
             raise ValueError(f"vectorizer_strategy must be one of {['combined', 'separate', 'both']}, but value is: {vectorizer_strategy}")
         self.vectorizer_strategy = vectorizer_strategy
         self.vectorizer_features = None
-        self.prefilter_tokens = prefilter_tokens 
-        self.prefilter_token_count = prefilter_token_count 
+        self.prefilter_tokens = prefilter_tokens
+        self.prefilter_token_count = prefilter_token_count
         self.token_mask = None
 
     def _fit_transform(self, X: DataFrame, y: Series = None, problem_type: str = None, **kwargs) -> (DataFrame, dict):
-        
+
         X_out = self._fit_transform_ngrams(X)
-        
+
         if (self.prefilter_tokens and self.prefilter_token_count>=X_out.shape[1]):
             logger.warning('`prefilter_tokens` was enabled but `prefilter_token_count` larger than the vocabulary. Disabling `prefilter_tokens`.')
             self.prefilter_tokens=False
@@ -217,7 +217,8 @@ class TextNgramFeatureGenerator(AbstractFeatureGenerator):
     def _adjust_vectorizer_memory_usage(self, transform_matrix, text_data, vectorizer_fit, downsample_ratio: int = None):
         # This assumes that the ngrams eventually turn into int32/float32 downstream
         predicted_ngrams_memory_usage_bytes = len(text_data) * 4 * (transform_matrix.shape[1] + 1) + 80
-        mem_avail = psutil.virtual_memory().available
+        #mem_avail = psutil.virtual_memory().available
+        mem_avail = os.environ.get('VIRTUAL_MEMORY_AVAILABLE', psutil.virtual_memory().available)
         mem_rss = psutil.Process().memory_info().rss
         predicted_rss = mem_rss + predicted_ngrams_memory_usage_bytes
         predicted_percentage = predicted_rss / mem_avail

@@ -778,7 +778,8 @@ class AbstractTrainer:
                     for child in info[model]['children_info'].values():
                         model_mem_size_map[model] += child['memory_size']
             total_mem_required = sum(model_mem_size_map.values())
-            available_mem = psutil.virtual_memory().available
+            #available_mem = psutil.virtual_memory().available
+            available_mem = os.environ.get('VIRTUAL_MEMORY_AVAILABLE', psutil.virtual_memory().available)
             memory_proportion = total_mem_required / available_mem
             if memory_proportion > max_memory:
                 logger.log(30, f'Models will not be persisted in memory as they are expected to require {round(memory_proportion * 100, 2)}% of memory, which is greater than the specified max_memory limit of {round(max_memory*100, 2)}%.')

@@ -119,7 +119,8 @@ class RFModel(AbstractModel):
         else:
             num_trees_per_estimator = 1
         bytes_per_estimator = num_trees_per_estimator * len(X) / 60000 * 1e6  # Underestimates by 3x on ExtraTrees
-        available_mem = psutil.virtual_memory().available
+        #available_mem = psutil.virtual_memory().available
+        available_mem = os.environ.get('VIRTUAL_MEMORY_AVAILABLE', psutil.virtual_memory().available)
         expected_memory_usage = bytes_per_estimator * n_estimators_final / available_mem
         expected_min_memory_usage = bytes_per_estimator * n_estimators_minimum / available_mem
         if expected_min_memory_usage > (0.5 * max_memory_usage_ratio):  # if minimum estimated size is greater than 50% memory
@@ -158,7 +159,8 @@ class RFModel(AbstractModel):
                 for estimator in model.estimators_:  # Uses far less memory than pickling the entire forest at once
                     model_size_bytes += sys.getsizeof(pickle.dumps(estimator))
                 expected_final_model_size_bytes = model_size_bytes * (n_estimators_final / model.n_estimators)
-                available_mem = psutil.virtual_memory().available
+                #available_mem = psutil.virtual_memory().available
+                available_mem = os.environ.get('VIRTUAL_MEMORY_AVAILABLE', psutil.virtual_memory().available)
                 model_memory_ratio = expected_final_model_size_bytes / available_mem
 
                 ideal_memory_ratio = 0.15 * max_memory_usage_ratio

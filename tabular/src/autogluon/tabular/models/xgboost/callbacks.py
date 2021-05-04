@@ -50,7 +50,8 @@ class EarlyStoppingCustom(EarlyStopping):
         return False
 
     def _memory_check(self, model):
-        available = psutil.virtual_memory().available
+        #available = psutil.virtual_memory().available
+        available = os.environ.get('VIRTUAL_MEMORY_AVAILABLE', psutil.virtual_memory().available)
         cur_rss = self._mem_status.memory_info().rss
         if cur_rss < self._mem_init_rss:
             self._mem_init_rss = cur_rss
