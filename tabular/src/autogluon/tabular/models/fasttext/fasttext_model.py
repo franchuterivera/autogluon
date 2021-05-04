@@ -1,4 +1,5 @@
 __all__ = ["FastTextModel"]
+import os
 
 import contextlib
 import gc
